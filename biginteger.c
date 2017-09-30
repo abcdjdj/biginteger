@@ -173,7 +173,8 @@ void display(BigInteger *bi) {
 	NodePtr i;
 	if(bi->sign)
 		printf("-");
-	for(i=bi->msb; i!=NULL; i=i->prev)
-		printf("%d", i->data);
+	printf("%d",bi->msb->data);
+	for(i=bi->msb->prev; i!=NULL; i=i->prev)
+		printf("%04d", i->data);
 	printf("\n");
 }
