@@ -94,6 +94,23 @@ BigInteger *subtract_magnitude(BigInteger *x, BigInteger *y) {
 	return difference;
 }
 
+/* Compares the absolute value of x & y */
+int compare_abs(BigInteger *x, BigInteger *y) {
+	if(x->length > y->length) {
+		return 1;
+	} else if(x->length < y->length) {
+		return -1;
+	}
+	NodePtr i,j;
+	for(i=x->msb, j=y->msb; i!=NULL; i=i->prev, j=j->prev) {
+		if(i->data > j->data)
+			return 1;
+		else if(i->data < j->data)
+			return -1;
+	}
+	return 0;
+}
+
 /* Adds a normal int to the BigInteger */
 void add_int(BigInteger *x, int data) {
 	int carry = data;
