@@ -134,7 +134,19 @@ BigInteger *add(BigInteger *x, BigInteger *y) {
 	if(x->sign == y->sign) {
 		ans = add_magnitude(x,y,0);
 		ans->sign = x->sign;
+		return ans;
 	}
+	BigInteger *larger, *smaller;
+	if(compare_abs(x,y)==1) {
+		larger = x;
+		smaller = y;
+	} else {
+		larger = y;
+		smaller = x;
+	}
+	ans = subtract_magnitude(larger, smaller);
+	ans->sign = larger->sign;
+	return ans;
 }
 
 /* For internal use only
