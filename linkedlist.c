@@ -2,7 +2,7 @@
 #include "linkedlist.h"
 
 /* Insert at end of doubly linked list */
-void insert(NodePtr *head, NodePtr *tail, int data) {
+void insert_list(NodePtr *head, NodePtr *tail, int data) {
 
 	NodePtr tmp = malloc(sizeof(Node));
 	tmp->data = data;
@@ -19,5 +19,3 @@ void insert(NodePtr *head, NodePtr *tail, int data) {
 	(*tail)->next = tmp;
 	*tail = tmp;
 }
-
-	

@@ -7,6 +7,7 @@ typedef struct {
 	NodePtr msb;
 	NodePtr lsb;
 	int sign;
+	int length;
 } BigInteger;
 
 BigInteger *init(char *);
@@ -26,3 +27,5 @@ BigInteger *complement(BigInteger *);
 void add_int(BigInteger *, int);
 
 void delete(BigInteger *);
+
+void insert(BigInteger *, int);

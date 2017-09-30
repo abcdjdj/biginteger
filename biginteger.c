@@ -9,6 +9,7 @@ BigInteger *init(char *str) {
 
 	BigInteger *bi = malloc(sizeof(BigInteger));
 	bi->msb = bi->lsb = NULL;
+	bi->length = 0;
 
 	/* Initialize sign bit */
 	if(*str=='-'){
@@ -28,7 +29,7 @@ BigInteger *init(char *str) {
 		if(j==0) {
 			tmp[j] = str[i];
 			ans = stoi(tmp);
-			insert(&(bi->lsb), &(bi->msb), ans);
+			insert(bi, ans);
 			j=3;
 		} else {
 			tmp[j] = str[i];
@@ -40,7 +41,7 @@ BigInteger *init(char *str) {
 	}
 	ans = stoi(tmp);
 	if(ans!=0) {
-		insert(&(bi->lsb), &(bi->msb), ans);
+		insert(bi, ans);
 	}
 	return bi;
 }
@@ -50,11 +51,17 @@ BigInteger *clone(BigInteger *x) {
 	BigInteger *ans = malloc(sizeof(BigInteger));
 	ans->sign = x->sign;
 	ans->msb = ans->lsb = NULL;
-	
+	ans->length = 0;
+
 	NodePtr i;
 	for(i=x->lsb;i!=NULL;i=i->next)
-		insert(&(ans->lsb), &(ans->msb), i->data);
+		insert(ans, i->data);
 	return ans;
+}
+
+void insert(BigInteger *x, int data) {
+	++(x->length);
+	insert_list(&(x->lsb), &(x->msb), data);
 }
 
 /* Sign extends until there are the specified number of
@@ -97,7 +104,7 @@ void add_int(BigInteger *x, int data) {
 		}
 	}
 	if(carry!=0) {
-		insert(&(x->lsb), &(x->msb), carry);
+		insert(x, carry);
 	}
 }
 
@@ -113,17 +120,18 @@ BigInteger *add(BigInteger *x, BigInteger *y) {
  * WARNING :- Strictly adds only magnitudes */
 BigInteger *add_magnitude(BigInteger *x, BigInteger *y, int ignoreCarry) {
 	BigInteger *c = malloc(sizeof(BigInteger));
+	c->length = 0;
 	NodePtr a,b;
 	a = x->lsb;
 	b = y->lsb;
 	int carry = 0;
 	while(a || b) {
 		if(a==NULL) {
-			insert(&(c->lsb), &(c->msb), b->data + carry);
+			insert(c, b->data + carry);
 			b = b->next;
 			carry = 0;
 		} else if(b==NULL) {
-			insert(&(c->lsb), &(c->msb), a->data + carry);
+			insert(c, a->data + carry);
 			a = a->next;
 			carry = 0;
 		} else {
@@ -134,14 +142,14 @@ BigInteger *add_magnitude(BigInteger *x, BigInteger *y, int ignoreCarry) {
 			} else {
 				carry = 0;
 			}
-			insert(&(c->lsb), &(c->msb), ans);
+			insert(c, ans);
 			a = a->next;
 			b = b->next;
 		}
 	}
 
 	if(carry > 0 && !ignoreCarry)
-		insert(&(c->lsb), &(c->msb), carry);
+		insert(c, carry);
 	return c;
 }
 

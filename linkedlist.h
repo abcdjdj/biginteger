@@ -8,6 +8,4 @@ typedef struct Node {
 
 typedef Node* NodePtr;
 
-void insert(NodePtr *head, NodePtr *tail, int data);
-
-
+void insert_list(NodePtr *head, NodePtr *tail, int data);
