@@ -124,6 +124,8 @@ BigInteger *add(BigInteger *x, BigInteger *y) {
  * WARNING :- Strictly adds only magnitudes */
 BigInteger *add_magnitude(BigInteger *x, BigInteger *y, int ignoreCarry) {
 	BigInteger *c = malloc(sizeof(BigInteger));
+	c->msb = c->lsb = NULL;
+	c->sign = 0;
 	c->length = 0;
 	NodePtr a,b;
 	a = x->lsb;
