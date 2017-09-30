@@ -22,7 +22,7 @@ BigInteger *subtract_magnitude(BigInteger *, BigInteger *);
 
 BigInteger *clone(BigInteger *);
 
-BigInteger *complement(BigInteger *);
+void complement(BigInteger *);
 
 void add_int(BigInteger *, int);
 

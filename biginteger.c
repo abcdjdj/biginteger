@@ -67,27 +67,31 @@ void insert(BigInteger *x, int data) {
 /* Sign extends until there are the specified number of
  * groups of 4 digits in the linked list */
 void sign_extend(BigInteger *x, int groups) {
-
+	int diff = groups - x->length;
+	while(diff > 0) {
+		insert(x,0);
+		--diff;
+	}
 }
 
 /* Find r's complement of x */
-BigInteger *complement(BigInteger *x) {
-	BigInteger *ans = x; //= clone(x);
+void complement(BigInteger *x) {
 	NodePtr i;
-
-	for(i=ans->lsb;i!=NULL;i=i->next) {
+	for(i=x->lsb;i!=NULL;i=i->next) {
 		i->data = 10000 - i->data - 1;
 	}
-	ans->sign = 0;
-	add_int(ans,1);
-	return ans;
+	add_int(x,1);
 }
 
+/* Computes x-y using the r's complement method */
 BigInteger *subtract_magnitude(BigInteger *x, BigInteger *y) {
-	complement(y);
-	printf("INSDE SUB_MAG = ");
-	display(y);
-	return add_magnitude(x,y,1);
+
+	BigInteger *y_compl = clone(y);
+	sign_extend(y_compl, x->length);
+	complement(y_compl);
+	BigInteger *difference = add_magnitude(x,y_compl,1);
+	free(y_compl);
+	return difference;
 }
 
 /* Adds a normal int to the BigInteger */
