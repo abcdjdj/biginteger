@@ -284,12 +284,8 @@ static BigInteger *add_magnitude(BigInteger *x, BigInteger *y, int ignoreCarry) 
 			a = a->next;
 			b = b->next;
 		}
-		if(ans>=10000){
-			carry = ans / 10000;
-			ans = ans % 10000;
-		} else {
-			carry = 0;
-		}
+		carry = ans / 10000;
+		ans = ans % 10000;
 		insert(c, ans);
 	}
 
