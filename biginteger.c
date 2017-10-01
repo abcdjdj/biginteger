@@ -50,7 +50,7 @@ BigInteger *init(char *str) {
 		tmp[j--] = '0';
 	}
 	ans = stoi(tmp);
-	if(ans!=0) {
+	if(ans!=0  || bi->length == 0) {
 		insert(bi, ans);
 	}
 	return bi;
