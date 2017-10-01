@@ -12,6 +12,7 @@ static BigInteger *add_magnitude(BigInteger *, BigInteger *, int);
 static BigInteger *subtract_magnitude(BigInteger *, BigInteger *);
 static void multiply_int(BigInteger *, int);
 static void add_overwrite(BigInteger *, BigInteger *);
+static void remove_leading_zero(BigInteger *);
 /* End of static function declarations */
 
 /* Construct BigInteger from a char array */
@@ -74,6 +75,18 @@ static void insert(BigInteger *x, int data) {
 	insert_list(&(x->lsb), &(x->msb), data);
 }
 
+static void remove_leading_zero(BigInteger *x) {
+	NodePtr i, tmp;
+	for(i=x->msb; i->data==0 && i->prev!=NULL; i=tmp) {
+		tmp = i->prev;
+		delete_list(i);
+		--(x->length);
+	}
+	x->msb = i;
+	/* In case our number is just a 0, set sign to 0 */
+	if(x->length==1 && x->msb->data==0)
+		x->sign = 0;
+}
 
 /* Sign extends until there are the specified number of
  * groups of 4 digits in the linked list */
@@ -111,6 +124,7 @@ BigInteger *subtract(BigInteger *x, BigInteger *y) {
 	}
 	ans = subtract_magnitude(larger, smaller);
 	ans->sign = (larger==x)?(x->sign):(!x->sign);
+	remove_leading_zero(ans);
 
 	return ans;
 }
@@ -178,6 +192,7 @@ BigInteger *multiply(BigInteger *x, BigInteger *y) {
 	}
 	ans->lsb = original_lsb;
 	ans->sign = x->sign ^ y->sign;
+	remove_leading_zero(ans);
 	return ans;
 }
 
@@ -242,6 +257,7 @@ BigInteger *add(BigInteger *x, BigInteger *y) {
 	}
 	ans = subtract_magnitude(larger, smaller);
 	ans->sign = larger->sign;
+	remove_leading_zero(ans);
 	return ans;
 }
 
