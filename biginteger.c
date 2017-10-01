@@ -90,7 +90,7 @@ BigInteger *subtract_magnitude(BigInteger *x, BigInteger *y) {
 	sign_extend(y_compl, x->length);
 	complement(y_compl);
 	BigInteger *difference = add_magnitude(x,y_compl,1);
-	free(y_compl);
+	delete(y_compl);
 	return difference;
 }
 
