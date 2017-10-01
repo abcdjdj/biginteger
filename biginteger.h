@@ -16,18 +16,10 @@ void display(BigInteger *);
 
 BigInteger *add(BigInteger *, BigInteger *);
 
-BigInteger *add_magnitude(BigInteger *, BigInteger *, int);
-
 BigInteger *subtract(BigInteger *, BigInteger *);
 
-BigInteger *subtract_magnitude(BigInteger *, BigInteger *);
-
 BigInteger *clone(BigInteger *);
-
-void complement(BigInteger *);
 
 void add_int(BigInteger *, int);
 
 void delete(BigInteger *);
-
-void insert(BigInteger *, int);

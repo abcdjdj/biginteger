@@ -4,6 +4,14 @@
 #include "utilities.h"
 #include "biginteger.h"
 
+/* Static function declarations */
+static void insert(BigInteger *, int);
+static int compare_abs(BigInteger *, BigInteger *);
+static void complement(BigInteger *);
+static BigInteger *add_magnitude(BigInteger *, BigInteger *, int);
+static BigInteger *subtract_magnitude(BigInteger *, BigInteger *);
+/* End of static function declarations */
+
 /* Construct BigInteger from a char array */
 BigInteger *init(char *str) {
 
@@ -59,14 +67,14 @@ BigInteger *clone(BigInteger *x) {
 	return ans;
 }
 
-void insert(BigInteger *x, int data) {
+static void insert(BigInteger *x, int data) {
 	++(x->length);
 	insert_list(&(x->lsb), &(x->msb), data);
 }
 
 /* Sign extends until there are the specified number of
  * groups of 4 digits in the linked list */
-void sign_extend(BigInteger *x, int groups) {
+static void sign_extend(BigInteger *x, int groups) {
 	int diff = groups - x->length;
 	while(diff > 0) {
 		insert(x,0);
@@ -75,7 +83,7 @@ void sign_extend(BigInteger *x, int groups) {
 }
 
 /* Find r's complement of x */
-void complement(BigInteger *x) {
+static void complement(BigInteger *x) {
 	NodePtr i;
 	for(i=x->lsb;i!=NULL;i=i->next) {
 		i->data = 10000 - i->data - 1;
@@ -105,7 +113,7 @@ BigInteger *subtract(BigInteger *x, BigInteger *y) {
 }
 
 /* Computes x-y using the r's complement method */
-BigInteger *subtract_magnitude(BigInteger *x, BigInteger *y) {
+static BigInteger *subtract_magnitude(BigInteger *x, BigInteger *y) {
 
 	BigInteger *y_compl = clone(y);
 	sign_extend(y_compl, x->length);
@@ -172,7 +180,7 @@ BigInteger *add(BigInteger *x, BigInteger *y) {
 
 /* For internal use only
  * WARNING :- Strictly adds only magnitudes */
-BigInteger *add_magnitude(BigInteger *x, BigInteger *y, int ignoreCarry) {
+static BigInteger *add_magnitude(BigInteger *x, BigInteger *y, int ignoreCarry) {
 	BigInteger *c = malloc(sizeof(BigInteger));
 	c->msb = c->lsb = NULL;
 	c->sign = 0;
