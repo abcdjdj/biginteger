@@ -19,3 +19,11 @@ void insert_list(NodePtr *head, NodePtr *tail, int data) {
 	(*tail)->next = tmp;
 	*tail = tmp;
 }
+
+void delete_list(NodePtr node) {
+	if(node->prev!=NULL)
+		node->prev->next = node->next;
+	if(node->next!=NULL)
+		node->next->prev = node->prev;
+	free(node);
+}

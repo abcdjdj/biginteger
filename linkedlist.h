@@ -9,3 +9,5 @@ typedef struct Node {
 typedef Node* NodePtr;
 
 void insert_list(NodePtr *head, NodePtr *tail, int data);
+
+void delete_list(NodePtr node);
