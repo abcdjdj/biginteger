@@ -10,6 +10,8 @@ static int compare_abs(BigInteger *, BigInteger *);
 static void complement(BigInteger *);
 static BigInteger *add_magnitude(BigInteger *, BigInteger *, int);
 static BigInteger *subtract_magnitude(BigInteger *, BigInteger *);
+static void multiply_int(BigInteger *, int);
+static void add_overwrite(BigInteger *, BigInteger *);
 /* End of static function declarations */
 
 /* Construct BigInteger from a char array */
@@ -138,6 +140,73 @@ int compare_abs(BigInteger *x, BigInteger *y) {
 			return -1;
 	}
 	return 0;
+}
+
+/* Warning :- q has to be at most 4 digits long to
+ * or else int will overflow!! */
+static void multiply_int(BigInteger *x, int q) {
+	NodePtr i;
+	int carry = 0;
+	for(i = x->lsb; i!=NULL; i=i->next) {
+		i->data = i->data * q + carry;
+		carry = i->data / 10000;
+		i->data = i->data % 10000;
+	}
+	if(carry!=0)
+		insert(x, carry);
+}
+
+BigInteger *multiply(BigInteger *x, BigInteger *y) {
+	BigInteger *multiplier, *multiplicand;
+	if(x->length > y->length) {
+		multiplier = y;
+		multiplicand = x;
+	} else {
+		multiplier = x;
+		multiplicand = y;
+	}
+	BigInteger *ans = init("0");
+	NodePtr i, original_lsb = ans->lsb;
+	for(i=multiplier->lsb; i!=NULL; i=i->next) {
+		BigInteger *partial_prod = clone(multiplicand);
+		multiply_int(partial_prod, i->data);
+		add_overwrite(ans, partial_prod);
+
+		ans->lsb = ans->lsb->next;
+		delete(partial_prod);
+	}
+	ans->lsb = original_lsb;
+	ans->sign = x->sign ^ y->sign;
+	return ans;
+}
+
+static void add_overwrite(BigInteger *x, BigInteger *y) {
+	NodePtr a,b;
+	a = x->lsb;
+	b = y->lsb;
+	int carry = 0;
+	while(a || b) {
+		if(b==NULL) {
+			a->data = a->data + carry;
+			carry = a->data / 10000;
+			a->data = a->data % 10000;
+			a=a->next;
+		} else if(a==NULL) {
+			int ans = b->data + carry;
+			carry = ans/10000;
+			ans=ans%10000;
+			b=b->next;
+			insert(x, ans);
+		} else {
+			a->data = a->data + b->data + carry;
+			carry = a->data / 10000;
+			a->data = a->data % 10000;
+			a=a->next;
+			b=b->next;
+		}
+	}
+	if(carry > 0)
+		insert(x, carry);
 }
 
 /* Adds a normal int to the BigInteger */

@@ -18,6 +18,8 @@ BigInteger *add(BigInteger *, BigInteger *);
 
 BigInteger *subtract(BigInteger *, BigInteger *);
 
+BigInteger *multiply(BigInteger *, BigInteger *);
+
 BigInteger *clone(BigInteger *);
 
 void add_int(BigInteger *, int);
