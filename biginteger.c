@@ -74,6 +74,7 @@ static void insert(BigInteger *x, int data) {
 	insert_list(&(x->lsb), &(x->msb), data);
 }
 
+
 /* Sign extends until there are the specified number of
  * groups of 4 digits in the linked list */
 static void sign_extend(BigInteger *x, int groups) {
@@ -221,9 +222,6 @@ void add_int(BigInteger *x, int data) {
 		} else {
 			carry = 0;
 		}
-	}
-	if(carry!=0) {
-		insert(x, carry);
 	}
 }
 
