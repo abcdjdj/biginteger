@@ -162,13 +162,25 @@ BigInteger *add_magnitude(BigInteger *x, BigInteger *y, int ignoreCarry) {
 	int carry = 0;
 	while(a || b) {
 		if(a==NULL) {
-			insert(c, b->data + carry);
+			int ans = b->data + carry;
+			if(ans>=10000){
+				carry = ans / 10000;
+				ans = ans % 10000;
+			} else {
+				carry = 0;
+			}
+			insert(c, ans);
 			b = b->next;
-			carry = 0;
 		} else if(b==NULL) {
-			insert(c, a->data + carry);
+			int ans = a->data + carry;
+			if(ans>=10000){
+				carry = ans / 10000;
+				ans = ans % 10000;
+			} else {
+				carry = 0;
+			}
+			insert(c, ans);
 			a = a->next;
-			carry = 0;
 		} else {
 			int ans = a->data + b->data + carry;
 			if(ans >= 10000) {
