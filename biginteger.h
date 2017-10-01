@@ -18,6 +18,8 @@ BigInteger *add(BigInteger *, BigInteger *);
 
 BigInteger *add_magnitude(BigInteger *, BigInteger *, int);
 
+BigInteger *subtract(BigInteger *, BigInteger *);
+
 BigInteger *subtract_magnitude(BigInteger *, BigInteger *);
 
 BigInteger *clone(BigInteger *);

@@ -83,6 +83,27 @@ void complement(BigInteger *x) {
 	add_int(x,1);
 }
 
+BigInteger *subtract(BigInteger *x, BigInteger *y) {
+	BigInteger *ans;
+	if(x->sign != y->sign) {
+		ans = add_magnitude(x, y, 0);
+		ans->sign = x->sign;
+		return ans;
+	}
+	BigInteger *larger, *smaller;
+	if(compare_abs(x,y)==1) {
+		larger = x;
+		smaller = y;
+	} else {
+		larger = y;
+		smaller = x;
+	}
+	ans = subtract_magnitude(larger, smaller);
+	ans->sign = (larger==x)?(x->sign):(!x->sign);
+
+	return ans;
+}
+
 /* Computes x-y using the r's complement method */
 BigInteger *subtract_magnitude(BigInteger *x, BigInteger *y) {
 
