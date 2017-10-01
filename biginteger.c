@@ -159,40 +159,26 @@ BigInteger *add_magnitude(BigInteger *x, BigInteger *y, int ignoreCarry) {
 	NodePtr a,b;
 	a = x->lsb;
 	b = y->lsb;
-	int carry = 0;
+	int carry = 0, ans;
 	while(a || b) {
 		if(a==NULL) {
-			int ans = b->data + carry;
-			if(ans>=10000){
-				carry = ans / 10000;
-				ans = ans % 10000;
-			} else {
-				carry = 0;
-			}
-			insert(c, ans);
+			ans = b->data + carry;
 			b = b->next;
 		} else if(b==NULL) {
-			int ans = a->data + carry;
-			if(ans>=10000){
-				carry = ans / 10000;
-				ans = ans % 10000;
-			} else {
-				carry = 0;
-			}
-			insert(c, ans);
+			ans = a->data + carry;
 			a = a->next;
 		} else {
-			int ans = a->data + b->data + carry;
-			if(ans >= 10000) {
-				carry = ans / 10000;
-				ans = ans % 10000;
-			} else {
-				carry = 0;
-			}
-			insert(c, ans);
+			ans = a->data + b->data + carry;
 			a = a->next;
 			b = b->next;
 		}
+		if(ans>=10000){
+			carry = ans / 10000;
+			ans = ans % 10000;
+		} else {
+			carry = 0;
+		}
+		insert(c, ans);
 	}
 
 	if(carry > 0 && !ignoreCarry)
