@@ -5,7 +5,8 @@
 #include "biginteger.h"
 
 /* Static function declarations */
-static void insert(BigInteger *, int);
+static void insert_lsb(BigInteger *, int);
+static void insert_msb(BigInteger *, int);
 static int compare_abs(BigInteger *, BigInteger *);
 static void complement(BigInteger *);
 static BigInteger *add_magnitude(BigInteger *, BigInteger *, int);
@@ -40,7 +41,7 @@ BigInteger *init(char *str) {
 		if(j==0) {
 			tmp[j] = str[i];
 			ans = stoi(tmp);
-			insert(bi, ans);
+			insert_lsb(bi, ans);
 			j=3;
 		} else {
 			tmp[j] = str[i];
@@ -52,7 +53,7 @@ BigInteger *init(char *str) {
 	}
 	ans = stoi(tmp);
 	if(ans!=0  || bi->length == 0) {
-		insert(bi, ans);
+		insert_lsb(bi, ans);
 	}
 	return bi;
 }
@@ -66,11 +67,11 @@ BigInteger *clone(BigInteger *x) {
 
 	NodePtr i;
 	for(i=x->lsb;i!=NULL;i=i->next)
-		insert(ans, i->data);
+		insert_lsb(ans, i->data);
 	return ans;
 }
 
-static void insert(BigInteger *x, int data) {
+static void insert_lsb(BigInteger *x, int data) {
 	++(x->length);
 	insert_tail(&(x->lsb), &(x->msb), data);
 }
@@ -173,7 +174,7 @@ static void multiply_int(BigInteger *x, int q) {
 		i->data = i->data % 10000;
 	}
 	if(carry!=0)
-		insert(x, carry);
+		insert_lsb(x, carry);
 }
 
 BigInteger *multiply(BigInteger *x, BigInteger *y) {
@@ -217,7 +218,7 @@ static void add_overwrite(BigInteger *x, BigInteger *y, int ignoreCarry) {
 			carry = ans/10000;
 			ans=ans%10000;
 			b=b->next;
-			insert(x, ans);
+			insert_lsb(x, ans);
 		} else {
 			a->data = a->data + b->data + carry;
 			carry = a->data / 10000;
@@ -227,7 +228,7 @@ static void add_overwrite(BigInteger *x, BigInteger *y, int ignoreCarry) {
 		}
 	}
 	if(carry > 0 && !ignoreCarry)
-		insert(x, carry);
+		insert_lsb(x, carry);
 }
 
 /* Adds a normal int to the BigInteger */
@@ -291,11 +292,11 @@ static BigInteger *add_magnitude(BigInteger *x, BigInteger *y, int ignoreCarry) 
 		}
 		carry = ans / 10000;
 		ans = ans % 10000;
-		insert(c, ans);
+		insert_lsb(c, ans);
 	}
 
 	if(carry > 0 && !ignoreCarry)
-		insert(c, carry);
+		insert_lsb(c, carry);
 	return c;
 }
 
