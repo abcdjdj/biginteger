@@ -75,6 +75,11 @@ static void insert(BigInteger *x, int data) {
 	insert_tail(&(x->lsb), &(x->msb), data);
 }
 
+static void insert_msb(BigInteger *x, int data) {
+	++(x->length);
+	insert_head(&(x->lsb), &(x->msb), data);
+}
+
 static void remove_leading_zero(BigInteger *x) {
 	NodePtr i, tmp;
 	for(i=x->msb; i->data==0 && i->prev!=NULL; i=tmp) {
