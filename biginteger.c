@@ -72,7 +72,7 @@ BigInteger *clone(BigInteger *x) {
 
 static void insert(BigInteger *x, int data) {
 	++(x->length);
-	insert_list(&(x->lsb), &(x->msb), data);
+	insert_tail(&(x->lsb), &(x->msb), data);
 }
 
 static void remove_leading_zero(BigInteger *x) {
