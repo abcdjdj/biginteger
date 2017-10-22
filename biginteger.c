@@ -11,7 +11,7 @@ static void complement(BigInteger *);
 static BigInteger *add_magnitude(BigInteger *, BigInteger *, int);
 static BigInteger *subtract_magnitude(BigInteger *, BigInteger *);
 static void multiply_int(BigInteger *, int);
-static void add_overwrite(BigInteger *, BigInteger *);
+static void add_overwrite(BigInteger *, BigInteger *, int);
 static void remove_leading_zero(BigInteger *);
 /* End of static function declarations */
 
@@ -185,7 +185,7 @@ BigInteger *multiply(BigInteger *x, BigInteger *y) {
 	for(i=multiplier->lsb; i!=NULL; i=i->next) {
 		BigInteger *partial_prod = clone(multiplicand);
 		multiply_int(partial_prod, i->data);
-		add_overwrite(ans, partial_prod);
+		add_overwrite(ans, partial_prod, 0);
 
 		ans->lsb = ans->lsb->next;
 		delete(partial_prod);
@@ -196,7 +196,7 @@ BigInteger *multiply(BigInteger *x, BigInteger *y) {
 	return ans;
 }
 
-static void add_overwrite(BigInteger *x, BigInteger *y) {
+static void add_overwrite(BigInteger *x, BigInteger *y, int ignoreCarry) {
 	NodePtr a,b;
 	a = x->lsb;
 	b = y->lsb;
@@ -221,7 +221,7 @@ static void add_overwrite(BigInteger *x, BigInteger *y) {
 			b=b->next;
 		}
 	}
-	if(carry > 0)
+	if(carry > 0 && !ignoreCarry)
 		insert(x, carry);
 }
 
