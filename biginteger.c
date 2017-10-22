@@ -99,7 +99,7 @@ static void remove_leading_zero(BigInteger *x) {
 static void sign_extend(BigInteger *x, int groups) {
 	int diff = groups - x->length;
 	while(diff > 0) {
-		insert(x,0);
+		insert_lsb(x,0);
 		--diff;
 	}
 }
