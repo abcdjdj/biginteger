@@ -83,14 +83,12 @@ static void insert_msb(BigInteger *x, int data) {
 }
 
 static void remove_leading_zero(BigInteger *x) {
-	NodePtr i, tmp;
-	for(i=x->msb; i->data==0 && i->prev!=NULL; i=tmp) {
-		tmp = i->prev;
-		delete_list(i);
+
+	while(x->length > 1 && x->msb->data==0) {
+		delete_list(&(x->lsb), &(x->msb), x->msb);
 		--(x->length);
 	}
-	x->msb = i;
-	/* In case our number is just a 0, set sign to 0 */
+	/* In case our number is just a 0, set sign to 0*/
 	if(x->length==1 && x->msb->data==0)
 		x->sign = 0;
 }
@@ -146,7 +144,6 @@ static BigInteger *subtract_magnitude(BigInteger *x, BigInteger *y) {
 	delete(y_compl);
 	return difference;
 }
-
 
 /* Subtracts y from x and overwrites contents of x */
 void subtract_overwrite(BigInteger *x, BigInteger *y) {
