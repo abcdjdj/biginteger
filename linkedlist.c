@@ -36,10 +36,18 @@ void insert_head(NodePtr *head, NodePtr *tail, int data) {
 	*head = tmp;
 }
 
-void delete_list(NodePtr node) {
-	if(node->prev!=NULL)
+void delete_list(NodePtr *head, NodePtr *tail, NodePtr node) {
+	if(*head == *tail && *head==node) {
+		*head = *tail = NULL;
+	} else if(node == *head) {
+		*head = node->next;
+		(*head)->prev = NULL;
+	} else if(node == *tail) {
+		*tail = node->prev;
+		(*tail)->next = NULL;
+	} else {
 		node->prev->next = node->next;
-	if(node->next!=NULL)
 		node->next->prev = node->prev;
+	}
 	free(node);
 }
