@@ -22,6 +22,8 @@ BigInteger *multiply(BigInteger *, BigInteger *);
 
 BigInteger *divide(BigInteger *n, BigInteger *d);
 
+int compare(BigInteger *, BigInteger *);
+
 BigInteger *clone(BigInteger *);
 
 void delete(BigInteger *);

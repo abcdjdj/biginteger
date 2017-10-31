@@ -462,6 +462,38 @@ BigInteger *add(BigInteger *x, BigInteger *y) {
 }
 
 /*
+ * Function:  compare
+ * --------------------
+ *  Compares x to y (signed comparison)
+ *  x, y : Pointers to the operands
+ *
+ *  returns: 1 if x>y, -1 if x<y and 0 if x=y
+ */
+int compare(BigInteger *x, BigInteger *y) {
+	if(!x || !y)
+		return -2;
+	int magnitude = compare_abs(x, y);
+	if(magnitude==1) {
+		if(x->sign)
+			return -1;
+		else
+			return 1;
+	} else if(magnitude==-1) {
+		if(y->sign)
+			return 1;
+		else
+			return -1;
+	} else {
+		if(x->sign==y->sign)
+			return 0;
+		else if(x->sign)
+			return -1;
+		else
+			return 1;
+	}
+}
+
+/*
  * Function:  delete
  * --------------------
  *  Entirely frees up memory occupied by a BigInteger
