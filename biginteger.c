@@ -16,7 +16,16 @@ static int compare_abs(BigInteger *, BigInteger *);
 
 /* +++++++++++++++++++++++++++ Constructors +++++++++++++++++++++++++++ */
 
-/* Construct BigInteger from a char array */
+/*
+ * Function:  init
+ * --------------------
+ *  Creates a BigInteger object from the string parameter
+ *   and returns a pointer to it
+ *  str : a string containing only digits
+ *
+ *  returns: a pointer to the newly constructed BigInteger
+ *           returns NULL on error (if a non digit character is found)
+ */
 BigInteger *init(char *str) {
 
 	BigInteger *bi = malloc(sizeof(BigInteger));
@@ -58,8 +67,16 @@ BigInteger *init(char *str) {
 	return bi;
 }
 
-/* Deep clones a BigInteger object */
-BigInteger *clone(BigInteger *x) {
+/*
+ * Function:  clone
+ * --------------------
+ *  Creates an exact copy of the passed BigInteger
+ *  x : pointer to a BigInteger
+ *
+ *  returns: a pointer to the newly constructed BigInteger
+ *           returns NULL on error
+ */
+ BigInteger *clone(BigInteger *x) {
 	BigInteger *ans = malloc(sizeof(BigInteger));
 	ans->sign = x->sign;
 	ans->msb = ans->lsb = NULL;
@@ -73,8 +90,18 @@ BigInteger *clone(BigInteger *x) {
 /* ++++++++++++++++++++++++ End of Constructors +++++++++++++++++++++++ */
 /* ++++++++++++++++++++++++ Internal static functions +++++++++++++++++ */
 
-/* Computes x-y using the r's complement method */
-static BigInteger *subtract_magnitude(BigInteger *x, BigInteger *y) {
+
+/*
+ * Function:  subtract_magnitude
+ * --------------------
+ *  Computes the difference (x-y) of two BigIntegers
+ *  and returns a pointer to it. Operands are unaffected
+ *  Subtraction is done using r's complement method
+ *  x, y : Pointers to the operands
+ *
+ *  returns: a pointer to the newly constructed BigInteger
+ */
+ static BigInteger *subtract_magnitude(BigInteger *x, BigInteger *y) {
 
 	BigInteger *y_compl = clone(y);
 	sign_extend(y_compl, x->length);
@@ -84,7 +111,15 @@ static BigInteger *subtract_magnitude(BigInteger *x, BigInteger *y) {
 	return difference;
 }
 
-/* Subtracts y from x and overwrites contents of x */
+/*
+ * Function:  subtract_overwrite
+ * --------------------
+ *  Subtracts y from x and overwrites contents of x
+ *  Subtraction is done using r's complement method
+ *  x, y : Pointers to the operands
+ *
+ *  returns: nothing (void)
+ */
 static void subtract_overwrite(BigInteger *x, BigInteger *y) {
 	sign_extend(y, x->length);
 	complement(y);
@@ -95,7 +130,14 @@ static void subtract_overwrite(BigInteger *x, BigInteger *y) {
 }
 
 
-/* Compares the absolute value of x & y */
+/*
+ * Function:  compare_abs
+ * --------------------
+ *  Compares the absolute value of x & y
+ *  x, y : Pointers to the operands
+ *
+ *  returns: 1 if x>y, -1 if x<y and 0 if x=y
+ */
 static int compare_abs(BigInteger *x, BigInteger *y) {
 	if(x->length > y->length) {
 		return 1;
@@ -112,7 +154,15 @@ static int compare_abs(BigInteger *x, BigInteger *y) {
 	return 0;
 }
 
-/* Divides y by x and returns the quotient */
+/*
+ * Function:  divide_magnitude
+ * --------------------
+ *  Divides y by x and returns the quotient
+ *  WARNING : Does not care about sign of operands
+ *  x, y : Pointers to the operands
+ *
+ *  returns: pointer to the quotient
+ */
 static BigInteger *divide_magnitude(BigInteger *n, BigInteger *d) {
 
 	if(compare_abs(n,d) < 0)
@@ -182,8 +232,16 @@ static BigInteger *divide_magnitude(BigInteger *n, BigInteger *d) {
 	return quotient;
 }
 
-/* Warning :- q has to be at most 4 digits long to
- * or else int will overflow!! */
+/*
+ * Function:  multiply_int
+ * --------------------
+ *  Multiplies a BigInteger with a primitive int variable
+ *  Contents of the BigInteger are overwritten
+ *  x : pointer to the BigInteger
+ *  q : a primitive int variable
+ *
+ *  returns: notihng (void)
+ */
 static void multiply_int(BigInteger *x, int q) {
 	NodePtr i;
 	int carry = 0;
@@ -196,7 +254,17 @@ static void multiply_int(BigInteger *x, int q) {
 		insert_msb(x, carry);
 }
 
-
+/*
+ * Function:  add_overwrite
+ * --------------------
+ *  Adds two BigIntegers and stores the result in the first one
+ *  x <-- x + y;
+ *  x : pointer to the BigInteger accumulator
+ *  y : pointer to the BigInteger operand
+ *  ignoreCarry : a flag to ignore the carry generated in the last step
+ *
+ *  returns: notihng (void)
+ */
 static void add_overwrite(BigInteger *x, BigInteger *y, int ignoreCarry) {
 	NodePtr a,b;
 	a = x->lsb;
@@ -226,8 +294,17 @@ static void add_overwrite(BigInteger *x, BigInteger *y, int ignoreCarry) {
 		insert_msb(x, carry);
 }
 
-/* For internal use only
- * WARNING :- Strictly adds only magnitudes */
+/*
+ * Function:  add_magnitude
+ * --------------------
+ *  Adds two BigIntegers and returns the result
+ *  WARNING : Does not care about sign!
+ *  x : pointer to the BigInteger operand
+ *  y : pointer to the BigInteger operand
+ *  ignoreCarry : a flag to ignore the carry generated in the last step
+ *
+ *  returns: pointer to the BigInteger sum
+ */
 static BigInteger *add_magnitude(BigInteger *x, BigInteger *y, int ignoreCarry) {
 	BigInteger *c = malloc(sizeof(BigInteger));
 	c->msb = c->lsb = NULL;
@@ -261,6 +338,15 @@ static BigInteger *add_magnitude(BigInteger *x, BigInteger *y, int ignoreCarry) 
 /* +++++++++++++++++++ End of static function ++++++++++++++++++++++ */
 /* +++++++++++++++++++ Exposed functions +++++++++++++++++++++++++++ */
 
+/*
+ * Function:  subtract
+ * --------------------
+ *  Subtracts two BigIntegers (x-y) and returns the result
+ *  x : pointer to the BigInteger operand
+ *  y : pointer to the BigInteger operand
+ *
+ *  returns: pointer to the BigInteger difference
+ */
 BigInteger *subtract(BigInteger *x, BigInteger *y) {
 	if(!x || !y)
 		return NULL;
@@ -286,7 +372,15 @@ BigInteger *subtract(BigInteger *x, BigInteger *y) {
 	return ans;
 }
 
-
+/*
+ * Function:  divide
+ * --------------------
+ *  Divides two BigIntegers (n/d) and returns the result
+ *  n : pointer to the BigInteger dividend
+ *  d : pointer to the BigInteger divisor
+ *
+ *  returns: pointer to the BigInteger quotient
+ */
 BigInteger *divide(BigInteger *n, BigInteger *d) {
 	if(!n || !d)
 		return NULL;
@@ -298,7 +392,15 @@ BigInteger *divide(BigInteger *n, BigInteger *d) {
 	return quotient;
 }
 
-
+/*
+ * Function:  multiply
+ * --------------------
+ *  Multiplies two BigIntegers and returns the result
+ *  x : pointer to the BigInteger operand
+ *  y : pointer to the BigInteger operand
+ *
+ *  returns: pointer to the BigInteger product
+ */
 BigInteger *multiply(BigInteger *x, BigInteger *y) {
 	if(!x || !y)
 		return NULL;
@@ -326,7 +428,15 @@ BigInteger *multiply(BigInteger *x, BigInteger *y) {
 	return ans;
 }
 
-
+/*
+ * Function:  add
+ * --------------------
+ * Adds two BigIntegers and returns the result
+ *  x : pointer to the BigInteger operand
+ *  y : pointer to the BigInteger operand
+ *
+ *  returns: pointer to the BigInteger sum
+ */
 BigInteger *add(BigInteger *x, BigInteger *y) {
 	if(!x || !y)
 		return NULL;
@@ -351,6 +461,15 @@ BigInteger *add(BigInteger *x, BigInteger *y) {
 	return ans;
 }
 
+/*
+ * Function:  delete
+ * --------------------
+ *  Entirely frees up memory occupied by a BigInteger
+ *  Frees up the entire linked list + BigInteger itself
+ *  x : pointer to the BigInteger operand
+ *
+ *  returns : nothing (void)
+ */
 void delete(BigInteger *x) {
 	if(!x)
 		return;
@@ -362,6 +481,14 @@ void delete(BigInteger *x) {
 	free(x);
 }
 
+/*
+ * Function:  display
+ * --------------------
+ *  Displays a BigInteger is human readable form
+ *  x : pointer to the BigInteger operand
+ *
+ *  returns: nothing (void)
+ */
 void display(BigInteger *bi) {
 
 	if(!bi) {

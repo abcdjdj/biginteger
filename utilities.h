@@ -8,7 +8,14 @@ void complement(BigInteger *);
 void remove_leading_zero(BigInteger *);
 int stoi(char *str);
 
-/* Converting a string to integer */
+/*
+ * Function:  stoi
+ * --------------------
+ *  Converts the given string to an int
+ *  str : string that contains only digits
+ *
+ *  returns: a native int equivalent of str
+ */
 int stoi(char *str) {
 
 	int n;
@@ -16,16 +23,42 @@ int stoi(char *str) {
 	return n;
 }
 
+/*
+ * Function:  insert_msb
+ * --------------------
+ *  Inserts the given int at the most significant position (tail of list)
+ *  x : BigInteger upon which insertion has to take place
+ *  data : the int to be inserted
+ *
+ *  returns: nothing (void)
+ */
 void insert_msb(BigInteger *x, int data) {
 	++(x->length);
 	insert_tail(&(x->lsb), &(x->msb), data);
 }
 
+/*
+ * Function:  insert_lsb
+ * --------------------
+ *  Inserts the given int at the least significant position (head of list)
+ *  x : BigInteger upon which insertion has to take place
+ *  data : the int to be inserted
+ *
+ *  returns: nothing (void)
+ */
 void insert_lsb(BigInteger *x, int data) {
 	++(x->length);
 	insert_head(&(x->lsb), &(x->msb), data);
 }
 
+/*
+ * Function:  remove_leading_zero
+ * --------------------
+ *  Removes all leading zeros (at msb end) from the list
+ *  x : BigInteger upon which deletion has to take place
+ *
+ *  returns: nothing (void)
+ */
 void remove_leading_zero(BigInteger *x) {
 
 	while(x->length > 1 && x->msb->data==0) {
@@ -37,8 +70,16 @@ void remove_leading_zero(BigInteger *x) {
 		x->sign = 0;
 }
 
-/* Sign extends until there are the specified number of
- * groups of 4 digits in the linked list */
+/*
+ * Function:  sign_extend
+ * --------------------
+ *  Adds leading 0s until there are the specified number of
+ *  digits/nodes in the linked list
+ *  x : BigInteger upon which insertion has to take place
+ *  groups : the final length of the linked list after inserting 0s
+ *
+ *  returns: nothing (void)
+ */
 void sign_extend(BigInteger *x, int groups) {
 	int diff = groups - x->length;
 	while(diff > 0) {
@@ -47,7 +88,15 @@ void sign_extend(BigInteger *x, int groups) {
 	}
 }
 
-/* Find r's complement of x */
+/*
+ * Function:  complement
+ * --------------------
+ *  Computes r's complement of the given BigInteger and overwrites it
+ *  Here r = Radix = 10000
+ *  x : BigInteger to be complemented
+ *
+ *  returns: nothing (void)
+ */
 void complement(BigInteger *x) {
 	NodePtr i;
 	for(i=x->lsb;i!=NULL;i=i->next) {
