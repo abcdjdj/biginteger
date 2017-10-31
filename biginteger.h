@@ -24,6 +24,4 @@ BigInteger *divide(BigInteger *n, BigInteger *d);
 
 BigInteger *clone(BigInteger *);
 
-void add_int(BigInteger *, int);
-
 void delete(BigInteger *);

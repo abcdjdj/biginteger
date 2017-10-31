@@ -2,20 +2,19 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "utilities.h"
-#include "biginteger.h"
 
 /* Static function declarations */
-static void insert_lsb(BigInteger *, int);
-static void insert_msb(BigInteger *, int);
-static int compare_abs(BigInteger *, BigInteger *);
-static void complement(BigInteger *);
 static BigInteger *add_magnitude(BigInteger *, BigInteger *, int);
 static BigInteger *subtract_magnitude(BigInteger *, BigInteger *);
 static BigInteger *divide_magnitude(BigInteger *, BigInteger *);
 static void multiply_int(BigInteger *, int);
 static void add_overwrite(BigInteger *, BigInteger *, int);
-static void remove_leading_zero(BigInteger *);
+static void subtract_overwrite(BigInteger *, BigInteger *);
+static int compare_abs(BigInteger *, BigInteger *);
 /* End of static function declarations */
+
+
+/* +++++++++++++++++++++++++++ Constructors +++++++++++++++++++++++++++ */
 
 /* Construct BigInteger from a char array */
 BigInteger *init(char *str) {
@@ -71,69 +70,8 @@ BigInteger *clone(BigInteger *x) {
 		insert_msb(ans, i->data);
 	return ans;
 }
-
-static void insert_msb(BigInteger *x, int data) {
-	++(x->length);
-	insert_tail(&(x->lsb), &(x->msb), data);
-}
-
-static void insert_lsb(BigInteger *x, int data) {
-	++(x->length);
-	insert_head(&(x->lsb), &(x->msb), data);
-}
-
-static void remove_leading_zero(BigInteger *x) {
-
-	while(x->length > 1 && x->msb->data==0) {
-		delete_list(&(x->lsb), &(x->msb), x->msb);
-		--(x->length);
-	}
-	/* In case our number is just a 0, set sign to 0*/
-	if(x->length==1 && x->msb->data==0)
-		x->sign = 0;
-}
-
-/* Sign extends until there are the specified number of
- * groups of 4 digits in the linked list */
-static void sign_extend(BigInteger *x, int groups) {
-	int diff = groups - x->length;
-	while(diff > 0) {
-		insert_msb(x,0);
-		--diff;
-	}
-}
-
-/* Find r's complement of x */
-static void complement(BigInteger *x) {
-	NodePtr i;
-	for(i=x->lsb;i!=NULL;i=i->next) {
-		i->data = 10000 - i->data - 1;
-	}
-	add_int(x,1);
-}
-
-BigInteger *subtract(BigInteger *x, BigInteger *y) {
-	BigInteger *ans;
-	if(x->sign != y->sign) {
-		ans = add_magnitude(x, y, 0);
-		ans->sign = x->sign;
-		remove_leading_zero(ans);
-		return ans;
-	}
-	BigInteger *larger, *smaller;
-	if(compare_abs(x,y)==1) {
-		larger = x;
-		smaller = y;
-	} else {
-		larger = y;
-		smaller = x;
-	}
-	ans = subtract_magnitude(larger, smaller);
-	ans->sign = (larger==x)?(x->sign):(!x->sign);
-	remove_leading_zero(ans);
-
-	return ans;
-}
+/* ++++++++++++++++++++++++ End of Constructors +++++++++++++++++++++++ */
+/* ++++++++++++++++++++++++ Internal static functions +++++++++++++++++ */
 
 /* Computes x-y using the r's complement method */
 static BigInteger *subtract_magnitude(BigInteger *x, BigInteger *y) {
@@ -147,7 +85,7 @@ static BigInteger *subtract_magnitude(BigInteger *x, BigInteger *y) {
 }
 
 /* Subtracts y from x and overwrites contents of x */
-void subtract_overwrite(BigInteger *x, BigInteger *y) {
+static void subtract_overwrite(BigInteger *x, BigInteger *y) {
 	sign_extend(y, x->length);
 	complement(y);
 	add_overwrite(x, y, 1);
@@ -156,8 +94,9 @@ void subtract_overwrite(BigInteger *x, BigInteger *y) {
 	remove_leading_zero(y);
 }
 
+
 /* Compares the absolute value of x & y */
-int compare_abs(BigInteger *x, BigInteger *y) {
+static int compare_abs(BigInteger *x, BigInteger *y) {
 	if(x->length > y->length) {
 		return 1;
 	} else if(x->length < y->length) {
@@ -171,15 +110,6 @@ int compare_abs(BigInteger *x, BigInteger *y) {
 			return -1;
 	}
 	return 0;
-}
-
-BigInteger *divide(BigInteger *n, BigInteger *d) {
-	if(d->length==1 && d->msb->data==0)
-		return NULL;
-	BigInteger *quotient = divide_magnitude(n, d);
-	quotient->sign = n->sign ^ d->sign;
-	remove_leading_zero(quotient);
-	return quotient;
 }
 
 /* Divides y by x and returns the quotient */
@@ -266,30 +196,6 @@ static void multiply_int(BigInteger *x, int q) {
 		insert_msb(x, carry);
 }
 
-BigInteger *multiply(BigInteger *x, BigInteger *y) {
-	BigInteger *multiplier, *multiplicand;
-	if(x->length > y->length) {
-		multiplier = y;
-		multiplicand = x;
-	} else {
-		multiplier = x;
-		multiplicand = y;
-	}
-	BigInteger *ans = init("0");
-	NodePtr i, original_lsb = ans->lsb;
-	for(i=multiplier->lsb; i!=NULL; i=i->next) {
-		BigInteger *partial_prod = clone(multiplicand);
-		multiply_int(partial_prod, i->data);
-		add_overwrite(ans, partial_prod, 0);
-
-		ans->lsb = ans->lsb->next;
-		delete(partial_prod);
-	}
-	ans->lsb = original_lsb;
-	ans->sign = x->sign ^ y->sign;
-	remove_leading_zero(ans);
-	return ans;
-}
 
 static void add_overwrite(BigInteger *x, BigInteger *y, int ignoreCarry) {
 	NodePtr a,b;
@@ -318,43 +224,6 @@ static void add_overwrite(BigInteger *x, BigInteger *y, int ignoreCarry) {
 	}
 	if(carry > 0 && !ignoreCarry)
 		insert_msb(x, carry);
-}
-
-/* Adds a normal int to the BigInteger */
-void add_int(BigInteger *x, int data) {
-	int carry = data;
-	NodePtr i;
-	for(i=x->lsb;i!=NULL && carry!=0;i=i->next) {
-		i->data = i->data + carry;
-		if(i->data >= 10000) {
-			carry = i->data / 10000;
-			i->data = i->data % 10000;
-		} else {
-			carry = 0;
-		}
-	}
-}
-
-BigInteger *add(BigInteger *x, BigInteger *y) {
-	BigInteger *ans;
-	if(x->sign == y->sign) {
-		ans = add_magnitude(x,y,0);
-		ans->sign = x->sign;
-		remove_leading_zero(ans);
-		return ans;
-	}
-	BigInteger *larger, *smaller;
-	if(compare_abs(x,y)==1) {
-		larger = x;
-		smaller = y;
-	} else {
-		larger = y;
-		smaller = x;
-	}
-	ans = subtract_magnitude(larger, smaller);
-	ans->sign = larger->sign;
-	remove_leading_zero(ans);
-	return ans;
 }
 
 /* For internal use only
@@ -389,6 +258,90 @@ static BigInteger *add_magnitude(BigInteger *x, BigInteger *y, int ignoreCarry) 
 		insert_msb(c, carry);
 	return c;
 }
+/* +++++++++++++++++++ End of static function ++++++++++++++++++++++ */
+/* +++++++++++++++++++ Exposed functions +++++++++++++++++++++++++++ */
+
+BigInteger *subtract(BigInteger *x, BigInteger *y) {
+	BigInteger *ans;
+	if(x->sign != y->sign) {
+		ans = add_magnitude(x, y, 0);
+		ans->sign = x->sign;
+		remove_leading_zero(ans);
+		return ans;
+	}
+	BigInteger *larger, *smaller;
+	if(compare_abs(x,y)==1) {
+		larger = x;
+		smaller = y;
+	} else {
+		larger = y;
+		smaller = x;
+	}
+	ans = subtract_magnitude(larger, smaller);
+	ans->sign = (larger==x)?(x->sign):(!x->sign);
+	remove_leading_zero(ans);
+
+	return ans;
+}
+
+
+BigInteger *divide(BigInteger *n, BigInteger *d) {
+	if(d->length==1 && d->msb->data==0)
+		return NULL;
+	BigInteger *quotient = divide_magnitude(n, d);
+	quotient->sign = n->sign ^ d->sign;
+	remove_leading_zero(quotient);
+	return quotient;
+}
+
+
+BigInteger *multiply(BigInteger *x, BigInteger *y) {
+	BigInteger *multiplier, *multiplicand;
+	if(x->length > y->length) {
+		multiplier = y;
+		multiplicand = x;
+	} else {
+		multiplier = x;
+		multiplicand = y;
+	}
+	BigInteger *ans = init("0");
+	NodePtr i, original_lsb = ans->lsb;
+	for(i=multiplier->lsb; i!=NULL; i=i->next) {
+		BigInteger *partial_prod = clone(multiplicand);
+		multiply_int(partial_prod, i->data);
+		add_overwrite(ans, partial_prod, 0);
+
+		ans->lsb = ans->lsb->next;
+		delete(partial_prod);
+	}
+	ans->lsb = original_lsb;
+	ans->sign = x->sign ^ y->sign;
+	remove_leading_zero(ans);
+	return ans;
+}
+
+
+BigInteger *add(BigInteger *x, BigInteger *y) {
+	BigInteger *ans;
+	if(x->sign == y->sign) {
+		ans = add_magnitude(x,y,0);
+		ans->sign = x->sign;
+		remove_leading_zero(ans);
+		return ans;
+	}
+	BigInteger *larger, *smaller;
+	if(compare_abs(x,y)==1) {
+		larger = x;
+		smaller = y;
+	} else {
+		larger = y;
+		smaller = x;
+	}
+	ans = subtract_magnitude(larger, smaller);
+	ans->sign = larger->sign;
+	remove_leading_zero(ans);
+	return ans;
+}
 
 void delete(BigInteger *x) {
 	NodePtr i,tmp;
@@ -409,3 +362,5 @@ void display(BigInteger *bi) {
 		printf("%04d", i->data);
 	printf("\n");
 }
+
+/* ++++++++++++++++++ End of exposed functions ++++++++++++++++++++ */
