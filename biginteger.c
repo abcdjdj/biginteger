@@ -262,6 +262,8 @@ static BigInteger *add_magnitude(BigInteger *x, BigInteger *y, int ignoreCarry) 
 /* +++++++++++++++++++ Exposed functions +++++++++++++++++++++++++++ */
 
 BigInteger *subtract(BigInteger *x, BigInteger *y) {
+	if(!x || !y)
+		return NULL;
 	BigInteger *ans;
 	if(x->sign != y->sign) {
 		ans = add_magnitude(x, y, 0);
@@ -286,6 +288,8 @@ BigInteger *subtract(BigInteger *x, BigInteger *y) {
 
 
 BigInteger *divide(BigInteger *n, BigInteger *d) {
+	if(!n || !d)
+		return NULL;
 	if(d->length==1 && d->msb->data==0)
 		return NULL;
 	BigInteger *quotient = divide_magnitude(n, d);
@@ -296,6 +300,8 @@ BigInteger *divide(BigInteger *n, BigInteger *d) {
 
 
 BigInteger *multiply(BigInteger *x, BigInteger *y) {
+	if(!x || !y)
+		return NULL;
 	BigInteger *multiplier, *multiplicand;
 	if(x->length > y->length) {
 		multiplier = y;
@@ -322,6 +328,8 @@ BigInteger *multiply(BigInteger *x, BigInteger *y) {
 
 
 BigInteger *add(BigInteger *x, BigInteger *y) {
+	if(!x || !y)
+		return NULL;
 	BigInteger *ans;
 	if(x->sign == y->sign) {
 		ans = add_magnitude(x,y,0);
@@ -344,6 +352,8 @@ BigInteger *add(BigInteger *x, BigInteger *y) {
 }
 
 void delete(BigInteger *x) {
+	if(!x)
+		return;
 	NodePtr i,tmp;
 	for(i=x->lsb;i!=NULL;i=tmp) {
 		tmp = i->next;
@@ -354,6 +364,10 @@ void delete(BigInteger *x) {
 
 void display(BigInteger *bi) {
 
+	if(!bi) {
+		printf("null\n");
+		return;
+	}
 	NodePtr i;
 	if(bi->sign)
 		printf("-");
