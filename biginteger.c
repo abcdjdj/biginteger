@@ -11,6 +11,7 @@ static int compare_abs(BigInteger *, BigInteger *);
 static void complement(BigInteger *);
 static BigInteger *add_magnitude(BigInteger *, BigInteger *, int);
 static BigInteger *subtract_magnitude(BigInteger *, BigInteger *);
+static BigInteger *divide_magnitude(BigInteger *, BigInteger *);
 static void multiply_int(BigInteger *, int);
 static void add_overwrite(BigInteger *, BigInteger *, int);
 static void remove_leading_zero(BigInteger *);
@@ -146,6 +147,17 @@ static BigInteger *subtract_magnitude(BigInteger *x, BigInteger *y) {
 	return difference;
 }
 
+
+/* Subtracts y from x and overwrites contents of x */
+void subtract_overwrite(BigInteger *x, BigInteger *y) {
+	sign_extend(y, x->length);
+	complement(y);
+	add_overwrite(x, y, 1);
+	complement(y);
+	remove_leading_zero(x);
+	remove_leading_zero(y);
+}
+
 /* Compares the absolute value of x & y */
 int compare_abs(BigInteger *x, BigInteger *y) {
 	if(x->length > y->length) {
@@ -161,6 +173,85 @@ int compare_abs(BigInteger *x, BigInteger *y) {
 			return -1;
 	}
 	return 0;
+}
+
+BigInteger *divide(BigInteger *n, BigInteger *d) {
+	if(d->length==1 && d->msb->data==0)
+		return NULL;
+	BigInteger *quotient = divide_magnitude(n, d);
+	quotient->sign = n->sign ^ d->sign;
+	remove_leading_zero(quotient);
+	return quotient;
+}
+
+/* Divides y by x and returns the quotient */
+static BigInteger *divide_magnitude(BigInteger *n, BigInteger *d) {
+
+	if(compare_abs(n,d) < 0)
+		return init("0");
+	BigInteger *quotient = malloc(sizeof(BigInteger));
+	quotient->sign = 0;
+	quotient->msb = quotient->lsb = NULL;
+	quotient->length = 0;
+
+	/* Divisor lookup table for multiplication */
+	BigInteger *table[9999];
+	int i;
+	for(i=0; i <9999; ++i) {
+		table[i] = clone(d);
+		multiply_int(table[i], i+1);
+		table[i]->sign = 0;
+	}
+
+	BigInteger tmp, *wrapper = &tmp; // tmp is on the stack, not heap
+	wrapper->sign = 0;
+	wrapper->length = 1;
+	wrapper->msb = wrapper->lsb  = n->msb;
+	NodePtr nextDividend = wrapper->lsb->prev;
+	wrapper->lsb->prev = NULL;
+	do {
+		int count = 0;
+		/* Add next digit(s) of dividend if required */
+		while(compare_abs(wrapper, d) < 0 && nextDividend) {
+			++count;
+
+			wrapper->lsb->prev = nextDividend;
+			wrapper->lsb = nextDividend;
+			nextDividend = wrapper->lsb->prev;
+			wrapper->lsb->prev = NULL;
+			++(wrapper->length);
+
+			if(count>=2) {
+				insert_msb(quotient, 0);
+			}
+			remove_leading_zero(wrapper);
+		}
+
+		if(compare_abs(wrapper, d) < 0) {
+			insert_msb(quotient, 0);
+			break; // Means that nextDividend is null i.e end of dividend
+		}
+
+		int upper = 9999-1, lower = 0, mid;
+		while(upper >= lower) {
+			mid = (upper + lower)/2;
+			if(compare_abs(wrapper, table[mid]) >= 0) {
+				i = mid;
+				lower = mid + 1;
+			} else {
+				upper = mid - 1;
+			}
+		}
+
+		subtract_overwrite(wrapper, table[i]);
+		insert_msb(quotient, i+1);
+
+	} while(nextDividend!=NULL);
+
+	/* Free up the divisor table */
+	for(i=0; i <9999; ++i)
+		delete(table[i]);
+	return quotient;
 }
 
 /* Warning :- q has to be at most 4 digits long to

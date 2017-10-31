@@ -20,6 +20,8 @@ BigInteger *subtract(BigInteger *, BigInteger *);
 
 BigInteger *multiply(BigInteger *, BigInteger *);
 
+BigInteger *divide(BigInteger *n, BigInteger *d);
+
 BigInteger *clone(BigInteger *);
 
 void add_int(BigInteger *, int);
