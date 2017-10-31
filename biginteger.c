@@ -117,6 +117,7 @@ BigInteger *subtract(BigInteger *x, BigInteger *y) {
 	if(x->sign != y->sign) {
 		ans = add_magnitude(x, y, 0);
 		ans->sign = x->sign;
+		remove_leading_zero(ans);
 		return ans;
 	}
 	BigInteger *larger, *smaller;
@@ -339,6 +340,7 @@ BigInteger *add(BigInteger *x, BigInteger *y) {
 	if(x->sign == y->sign) {
 		ans = add_magnitude(x,y,0);
 		ans->sign = x->sign;
+		remove_leading_zero(ans);
 		return ans;
 	}
 	BigInteger *larger, *smaller;
