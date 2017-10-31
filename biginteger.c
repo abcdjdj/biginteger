@@ -42,7 +42,7 @@ BigInteger *init(char *str) {
 		if(j==0) {
 			tmp[j] = str[i];
 			ans = stoi(tmp);
-			insert_lsb(bi, ans);
+			insert_msb(bi, ans);
 			j=3;
 		} else {
 			tmp[j] = str[i];
@@ -54,7 +54,7 @@ BigInteger *init(char *str) {
 	}
 	ans = stoi(tmp);
 	if(ans!=0  || bi->length == 0) {
-		insert_lsb(bi, ans);
+		insert_msb(bi, ans);
 	}
 	return bi;
 }
@@ -68,16 +68,16 @@ BigInteger *clone(BigInteger *x) {
 
 	NodePtr i;
 	for(i=x->lsb;i!=NULL;i=i->next)
-		insert_lsb(ans, i->data);
+		insert_msb(ans, i->data);
 	return ans;
 }
 
-static void insert_lsb(BigInteger *x, int data) {
+static void insert_msb(BigInteger *x, int data) {
 	++(x->length);
 	insert_tail(&(x->lsb), &(x->msb), data);
 }
 
-static void insert_msb(BigInteger *x, int data) {
+static void insert_lsb(BigInteger *x, int data) {
 	++(x->length);
 	insert_head(&(x->lsb), &(x->msb), data);
 }
@@ -98,7 +98,7 @@ static void remove_leading_zero(BigInteger *x) {
 static void sign_extend(BigInteger *x, int groups) {
 	int diff = groups - x->length;
 	while(diff > 0) {
-		insert_lsb(x,0);
+		insert_msb(x,0);
 		--diff;
 	}
 }
@@ -220,13 +220,13 @@ static BigInteger *divide_magnitude(BigInteger *n, BigInteger *d) {
 			++(wrapper->length);
 
 			if(count>=2) {
-				insert_msb(quotient, 0);
+				insert_lsb(quotient, 0);
 			}
 			remove_leading_zero(wrapper);
 		}
 
 		if(compare_abs(wrapper, d) < 0) {
-			insert_msb(quotient, 0);
+			insert_lsb(quotient, 0);
 			break; // Means that nextDividend is null i.e end of dividend
 		}
 
@@ -242,7 +242,7 @@ static BigInteger *divide_magnitude(BigInteger *n, BigInteger *d) {
 		}
 
 		subtract_overwrite(wrapper, table[i]);
-		insert_msb(quotient, i+1);
+		insert_lsb(quotient, i+1);
 
 	} while(nextDividend!=NULL);
 
@@ -263,7 +263,7 @@ static void multiply_int(BigInteger *x, int q) {
 		i->data = i->data % 10000;
 	}
 	if(carry!=0)
-		insert_lsb(x, carry);
+		insert_msb(x, carry);
 }
 
 BigInteger *multiply(BigInteger *x, BigInteger *y) {
@@ -307,7 +307,7 @@ static void add_overwrite(BigInteger *x, BigInteger *y, int ignoreCarry) {
 			carry = ans/10000;
 			ans=ans%10000;
 			b=b->next;
-			insert_lsb(x, ans);
+			insert_msb(x, ans);
 		} else {
 			a->data = a->data + b->data + carry;
 			carry = a->data / 10000;
@@ -317,7 +317,7 @@ static void add_overwrite(BigInteger *x, BigInteger *y, int ignoreCarry) {
 		}
 	}
 	if(carry > 0 && !ignoreCarry)
-		insert_lsb(x, carry);
+		insert_msb(x, carry);
 }
 
 /* Adds a normal int to the BigInteger */
@@ -382,11 +382,11 @@ static BigInteger *add_magnitude(BigInteger *x, BigInteger *y, int ignoreCarry) 
 		}
 		carry = ans / 10000;
 		ans = ans % 10000;
-		insert_lsb(c, ans);
+		insert_msb(c, ans);
 	}
 
 	if(carry > 0 && !ignoreCarry)
-		insert_lsb(c, carry);
+		insert_msb(c, carry);
 	return c;
 }
 
