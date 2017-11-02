@@ -36,6 +36,7 @@ void insert_head(NodePtr *head, NodePtr *tail, int data) {
 	*head = tmp;
 }
 
+/* Deletes Node pointed to by "node" */
 void delete_list(NodePtr *head, NodePtr *tail, NodePtr node) {
 	if(*head == *tail && *head==node) {
 		*head = *tail = NULL;

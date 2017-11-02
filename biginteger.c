@@ -77,6 +77,8 @@ BigInteger *init(char *str) {
  *           returns NULL on error
  */
  BigInteger *clone(BigInteger *x) {
+	if(!x)
+		return NULL;
 	BigInteger *ans = malloc(sizeof(BigInteger));
 	ans->sign = x->sign;
 	ans->msb = ans->lsb = NULL;
